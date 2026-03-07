@@ -1,0 +1,35 @@
+name: Grade Submission
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  dispatch-grader:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pending status comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.CROSS_REPO_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: '⏳ **Grading in progress** — your submission is being evaluated. Results will be posted here shortly.'
+            });
+
+      - name: Dispatch grading to private repo
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.CROSS_REPO_TOKEN }}
+          repository: ${{ github.repository_owner }}/private-devops-grader
+          event-type: grade-submission
+          client-payload: |
+            {
+              "pr_repo": "${{ github.event.pull_request.head.repo.full_name }}",
+              "pr_ref": "${{ github.event.pull_request.head.sha }}",
+              "pr_number": "${{ github.event.pull_request.number }}",
+              "public_repo": "${{ github.repository }}"
+            }

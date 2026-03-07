@@ -1,3 +1,15 @@
+# Kiro
+.kiro/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

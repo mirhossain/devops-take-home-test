@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-reader-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-reader-app
+  template:
+    metadata:
+      labels:
+        app: log-reader-app
+    spec:
+      containers:
+        - name: log-reader
+          image: log-reader-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
