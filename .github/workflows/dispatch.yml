@@ -16,33 +16,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Check challenge status and deadline
-        id: deadline_check
+      - name: Check if challenge started
+        id: challenge_check
         shell: bash
         run: |
           set -euo pipefail
-
           if [ ! -f .started_at ]; then
-            echo "proceed=false" >> "$GITHUB_OUTPUT"
-            echo "reason=not_started" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "started=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "started=true" >> "$GITHUB_OUTPUT"
           fi
-
-          STARTED_AT=$(cat .started_at | tr -d '[:space:]')
-          STARTED_EPOCH=$(date -d "$STARTED_AT" +%s)
-          DEADLINE_EPOCH=$((STARTED_EPOCH + 86400))
-          NOW_EPOCH=$(date +%s)
-
-          if [ "$NOW_EPOCH" -gt "$DEADLINE_EPOCH" ]; then
-            echo "proceed=false" >> "$GITHUB_OUTPUT"
-            echo "reason=expired" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "proceed=true" >> "$GITHUB_OUTPUT"
 
       - name: Post comment - challenge not started
-        if: steps.deadline_check.outputs.proceed == 'false' && steps.deadline_check.outputs.reason == 'not_started'
+        if: steps.challenge_check.outputs.started == 'false'
         uses: actions/github-script@v7
         with:
           script: |
@@ -53,20 +39,8 @@ jobs:
               body: '⚠️ **Challenge not started** — please start the challenge first by going to the **Actions** tab and running the **Start Challenge** workflow.'
             });
 
-      - name: Post comment - deadline passed
-        if: steps.deadline_check.outputs.proceed == 'false' && steps.deadline_check.outputs.reason == 'expired'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
-              body: '⛔ **Submission deadline has passed** — your 24-hour submission window has closed. Late submissions are not accepted.'
-            });
-
       - name: Create pending status comment
-        if: steps.deadline_check.outputs.proceed == 'true'
+        if: steps.challenge_check.outputs.started == 'true'
         uses: actions/github-script@v7
         with:
           script: |
@@ -78,7 +52,7 @@ jobs:
             });
 
       - name: Dispatch grading to private repo
-        if: steps.deadline_check.outputs.proceed == 'true'
+        if: steps.challenge_check.outputs.started == 'true'
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.CROSS_REPO_TOKEN }}
