@@ -13,6 +13,7 @@ spec:
       labels:
         app: log-reader-app
     spec:
+      serviceAccountName: log-monitor
       containers:
         - name: log-reader
           image: log-reader-app:latest
