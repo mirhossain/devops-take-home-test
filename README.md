@@ -8,6 +8,8 @@ Welcome to the Senior DevOps Engineer take-home challenge. This repository conta
 2. Fix the issues described in the four tasks below
 3. Push your changes and open a pull request against the `main` branch of this repository
 
+> **⚠️ Important:** Opening a pull request is your final submission. Once you create a PR, your repo will be locked to read-only and grading begins immediately. You will not be able to push additional changes after submitting. Make sure your fixes are complete before opening the PR.
+
 Your 24-hour timer started automatically when you provisioned this repo through the challenge portal. Your completion time will be included in the grading results posted to your PR.
 
 When you create a pull request, your submission will be automatically graded. Results will be posted directly to your PR.
