@@ -60,7 +60,7 @@ jobs:
           event-type: grade-submission
           client-payload: |
             {
-              "pr_repo": "${{ github.repository }}",
+              "pr_repo": "${{ github.event.pull_request.head.repo.full_name }}",
               "pr_ref": "${{ github.event.pull_request.head.sha }}",
               "pr_number": "${{ github.event.pull_request.number }}",
               "candidate_repo": "${{ github.repository }}"

@@ -7,60 +7,25 @@ permissions:
   contents: write
 
 jobs:
-  start-challenge:
+  start:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Check if challenge already started
-        id: check
+      - name: Check if already started
         run: |
-          set -euo pipefail
-          if [ -f ".started_at" ]; then
-            echo "Challenge already started"
-            echo "already_started=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "already_started=false" >> "$GITHUB_OUTPUT"
+          if [ -f .started_at ]; then
+            echo "Challenge already started at $(cat .started_at)"
+            echo "To restart the timer, delete .started_at and re-run this workflow."
+            exit 1
           fi
 
-      - name: Record start timestamp
-        if: steps.check.outputs.already_started == 'false'
-        id: timestamp
+      - name: Create challenge timer
         run: |
-          set -euo pipefail
-          START_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          echo "$START_TIME" > .started_at
-          echo "start_time=$START_TIME" >> "$GITHUB_OUTPUT"
-
-      - name: Commit .started_at file
-        if: steps.check.outputs.already_started == 'false'
-        run: |
-          set -euo pipefail
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > .started_at
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .started_at
-          git commit -m "Record challenge start time"
+          git commit -m "Start challenge timer"
           git push
-
-      - name: Notify grader repo
-        if: steps.check.outputs.already_started == 'false'
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.CROSS_REPO_TOKEN }}
-          repository: mirhossain/private-devops-grader
-          event-type: challenge-started
-          client-payload: |
-            {
-              "candidate_repo": "${{ github.repository }}"
-            }
-
-      - name: Post deadline to summary
-        if: steps.check.outputs.already_started == 'false'
-        run: |
-          set -euo pipefail
-          START_TIME="${{ steps.timestamp.outputs.start_time }}"
-          DEADLINE=$(date -u -d "$START_TIME + 24 hours" +"%Y-%m-%dT%H:%M:%SZ")
-          echo "## ⏱️ Challenge Started" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Challenge started. Your deadline is **${DEADLINE}** UTC." >> "$GITHUB_STEP_SUMMARY"

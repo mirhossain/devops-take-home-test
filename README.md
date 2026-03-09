@@ -4,16 +4,11 @@ Welcome to the Senior DevOps Engineer take-home challenge. This repository conta
 
 ## How to Submit
 
-1. Go to the **Actions** tab of this repository and run the **"Start Challenge"** workflow when you are ready to begin
-2. Clone this repository to your local machine
-3. Fix the issues described in the four tasks below
-4. Push your changes and open a pull request against the `main` branch of this repository
+1. Clone this repository to your local machine
+2. Fix the issues described in the four tasks below
+3. Push your changes and open a pull request against the `main` branch of this repository
 
-**Important:**
-
-- Run the **"Start Challenge"** workflow first — this starts a timer that tracks how long you take.
-- Your completion time will be included in the grading results posted to your PR.
-- Pull requests opened **before** starting the challenge will be **rejected**. You must run the "Start Challenge" workflow first.
+Your 24-hour timer started automatically when you provisioned this repo through the challenge portal. Your completion time will be included in the grading results posted to your PR.
 
 When you create a pull request, your submission will be automatically graded. Results will be posted directly to your PR.
 
