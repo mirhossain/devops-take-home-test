@@ -61,3 +61,5 @@ The Python Flask application is meant to run inside a Kubernetes cluster, aggreg
 - Add proper error handling around Kubernetes API calls.
 
 The app should continue to serve on port 8080 using Flask.
+
+<!-- E2E sad-path validation run 22863107124 -->
