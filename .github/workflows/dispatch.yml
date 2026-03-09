@@ -13,19 +13,35 @@ jobs:
   dispatch-grader:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
       - name: Check if challenge started
         id: challenge_check
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ ! -f .started_at ]; then
-            echo "started=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "started=true" >> "$GITHUB_OUTPUT"
-          fi
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Check for .started_at on main first, then fall back to the PR branch.
+            // The portal/start-challenge commits .started_at to main, but the PR branch
+            // may have been created before that. The E2E validate workflow puts it on the
+            // PR branch directly. So we check both.
+            async function fileExists(ref) {
+              try {
+                await github.rest.repos.getContent({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: '.started_at',
+                  ref
+                });
+                return true;
+              } catch (e) {
+                if (e.status === 404) return false;
+                throw e;
+              }
+            }
+
+            const onMain = await fileExists('main');
+            const onPR = await fileExists(context.payload.pull_request.head.sha);
+            const started = onMain || onPR;
+            core.info(`.started_at on main: ${onMain}, on PR: ${onPR}`);
+            core.setOutput('started', started ? 'true' : 'false');
 
       - name: Post comment - challenge not started
         if: steps.challenge_check.outputs.started == 'false'
