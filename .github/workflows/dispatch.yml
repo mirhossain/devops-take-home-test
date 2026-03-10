@@ -24,32 +24,6 @@ jobs:
               body: '⏳ **Grading in progress** — your submission is being evaluated. Results will be posted here shortly.'
             });
 
-      - name: Lock repo — downgrade candidate to read-only
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.CROSS_REPO_TOKEN }}
-          script: |
-            // Extract candidate username from repo name (devops-challenge-{username})
-            const repoName = context.repo.repo;
-            const prefix = 'devops-challenge-';
-            if (!repoName.startsWith(prefix)) {
-              core.info(`Repo "${repoName}" doesn't match candidate pattern, skipping lock`);
-              return;
-            }
-            const username = repoName.slice(prefix.length);
-            core.info(`Downgrading ${username} to read-only on ${context.repo.owner}/${repoName}`);
-            try {
-              await github.rest.repos.addCollaborator({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                username,
-                permission: 'pull',
-              });
-              core.info(`${username} downgraded to pull (read-only)`);
-            } catch (e) {
-              core.warning(`Failed to downgrade ${username}: ${e.message}`);
-            }
-
       - name: Dispatch grading to private repo
         uses: peter-evans/repository-dispatch@v3
         with:
