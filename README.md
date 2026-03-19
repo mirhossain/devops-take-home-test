@@ -55,3 +55,5 @@ The Python Flask application is meant to run inside a Kubernetes cluster, aggreg
 Please optimize the usage of the Kubernetes SDK to fix any functional issues as well as optimize the program itself with improved error handling, logging, etc.
 
 Additionally, The app should serve requests on port 8080 using Flask.
+
+<!-- E2E sad-path validation run 23319111694 -->
