@@ -52,6 +52,12 @@ The Deployment (`kubernetes/deployment.yaml`) also needs to reference the new Se
 
 The Python Flask application is meant to run inside a Kubernetes cluster, aggregate pod logs, and report pod health. It has several bugs currently present.
 
-Please optimize the usage of the Kubernetes SDK to fix any functional issues as well as optimize the program itself with improved error handling, logging, etc.
+Treat this task as a behavior contract, not just a syntax cleanup:
 
-Additionally, The app should serve requests on port 8080 using Flask.
+- The app must work from inside Kubernetes, not only with a local kubeconfig.
+- On startup, the app should verify that it can access pods in the cluster and log a clear success or failure message.
+- `GET /logs` should return JSON with an `entries` array. The response should surface only `ERROR` and `WARN` log lines, and each returned entry should include severity information.
+- `GET /health` should return JSON with per-pod health details under a `pods` array and should identify unhealthy pods such as crash-looping containers.
+- The app should still serve requests on port `8080`.
+
+The Python portion is graded both by source analysis and by running the app inside Kubernetes. If your Deployment or RBAC wiring prevents the app from listing pods or reading pod logs, the Python runtime checks will also lose credit.
