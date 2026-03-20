@@ -61,3 +61,5 @@ Treat this task as a behavior contract, not just a syntax cleanup:
 - The app should still serve requests on port `8080`.
 
 The Python portion is graded both by source analysis and by running the app inside Kubernetes. If your Deployment or RBAC wiring prevents the app from listing pods or reading pod logs, the Python runtime checks will also lose credit.
+
+<!-- E2E sad-path validation run 23323325481 -->
